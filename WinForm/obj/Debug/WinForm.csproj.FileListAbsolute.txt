@@ -1,0 +1,13 @@
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\obj\Debug\WinForm.csprojResolveAssemblyReference.cache
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\obj\Debug\WinForm.MainForm.resources
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\obj\Debug\WinForm.Properties.Resources.resources
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\obj\Debug\WinForm.csproj.GenerateResource.Cache
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\obj\Debug\WinForm.csproj.CoreCompileInputs.cache
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\bin\Debug\WinForm.exe.config
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\bin\Debug\WinForm.exe
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\bin\Debug\WinForm.pdb
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\bin\Debug\System.Runtime.WindowsRuntime.dll
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\bin\Debug\Windows.winmd
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\bin\Debug\System.Runtime.WindowsRuntime.xml
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\obj\Debug\WinForm.exe
+c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\obj\Debug\WinForm.pdb
