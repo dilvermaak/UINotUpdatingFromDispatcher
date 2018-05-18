@@ -21,12 +21,12 @@ namespace WinForm
             if (Debugger.IsAttached) Debugger.Break();
 
             Mutex mutex = null;
-            if (!Mutex.TryOpenExisting("NotifyIconsLogicMutex", out mutex))
+            if (!Mutex.TryOpenExisting("CommunicationPathMutex", out mutex))
             {
-                mutex = new Mutex(false, "NotifyIconsLogicMutex");
+                mutex = new Mutex(false, "CommunicationPathMutex");
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new MainForm());
+                Application.Run(new CommunicationPath());
                 mutex.Close();
             }
         }

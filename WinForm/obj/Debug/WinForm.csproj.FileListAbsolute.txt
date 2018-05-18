@@ -11,3 +11,4 @@ c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\bin\De
 c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\bin\Debug\System.Runtime.WindowsRuntime.xml
 c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\obj\Debug\WinForm.exe
 c:\users\dilan (private)\source\repos\UINotUpdatingFromDispatcher\WinForm\obj\Debug\WinForm.pdb
+C:\Users\Dilan (Private)\source\repos\UINotUpdatingFromDispatcher\WinForm\obj\Debug\WinForm.csproj.CopyComplete

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.AppService;
@@ -10,15 +6,11 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
 using Windows.Storage;
+using Windows.UI.Core.Preview;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -51,42 +43,64 @@ namespace UINotUpdatingFromDispatcher
                 toggleSwitchTest3.Toggled += toggleSwitchTest2_Toggled;
                 toggleSwitchTest3.Toggled += toggleSwitchTest3_Toggled;
             };
+
+            SystemNavigationManagerPreview mgr = SystemNavigationManagerPreview.GetForCurrentView();
+            mgr.CloseRequested += Mgr_CloseRequested;
+        }
+
+        private void Mgr_CloseRequested(object sender, SystemNavigationCloseRequestedPreviewEventArgs e)
+        {
+            // get deferral
+            Deferral deferral = e.GetDeferral();
+
+            // tell winfrm to exit
+            ValueSet exit = new ValueSet();
+            exit.Add("exit", null);
+            Send:
+            if (!SendToWin32(exit).Result) goto Send;
+
+            e.Handled = false;
+            deferral.Complete();
         }
 
         private void toggleSwitchTest1_Toggled(object sender, RoutedEventArgs e)
         {
             // set setting
             localSettings.Values["Test1"] = (toggleSwitchTest1.IsOn).ToString();
+
+            // update WinForm
+            SendToWin32(UpdateWin32());
+        }
+
+        private void toggleSwitchTest2_Toggled(object sender, RoutedEventArgs e)
+        {
+            // set setting
+            localSettings.Values["Test2"] = (toggleSwitchTest2.IsOn).ToString();
+
+            // update WinForm
+            SendToWin32(UpdateWin32());
+        }
+
+        private void toggleSwitchTest3_Toggled(object sender, RoutedEventArgs e)
+        {
+            // set setting
+            localSettings.Values["Test3"] = (toggleSwitchTest3.IsOn).ToString();
+
+            // update WinForm
+            SendToWin32(UpdateWin32());
         }
 
         private ValueSet UpdateWin32()
         {
             // generate int[] to send
-            int[] arrayToSend = null;
-            try
-            {
-                arrayToSend = new int[] { (localSettings.Values["Test1"].ToString() == "True") ? 1 : 0,
-                                          (localSettings.Values["Test2"].ToString() == "True") ? 1 : 0,
-                                          (localSettings.Values["Test3"].ToString() == "True") ? 1 : 0};
-            }
-            catch (NullReferenceException)
-            {
-                localSettings.Values["Test1"] = false.ToString();
-                localSettings.Values["Test2"] = false.ToString();
-                localSettings.Values["Test3"] = false.ToString();
+            int[] arrayToSend = new int[3];
 
-                /*
-                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                    localSettings.Values["Test1"] = (toggleSwitchTest1.IsOn).ToString();
-                    localSettings.Values["Test2"] = (toggleSwitchTest3.IsOn).ToString();
-                    localSettings.Values["Test3"] = (toggleSwitchTest3.IsOn).ToString();
-                });
-                
-                 * This also anyway returns false
-                 */
-            }
-
+            arrayToSend[0] = (localSettings.Values["Test1"] != null) ? Convert.ToInt32(Convert.ToBoolean(
+                localSettings.Values["Test1"])) : 0;
+            arrayToSend[1] = (localSettings.Values["Test2"] != null) ? Convert.ToInt32(Convert.ToBoolean(
+                localSettings.Values["Test2"])) : 0;
+            arrayToSend[2] = (localSettings.Values["Test3"] != null) ? Convert.ToInt32(Convert.ToBoolean(
+                localSettings.Values["Test3"])) : 0;
 
             // generate ValueSet to send to Win32
             ValueSet msg = new ValueSet();
@@ -94,21 +108,9 @@ namespace UINotUpdatingFromDispatcher
             return msg;
         }
 
-        private void toggleSwitchTest2_Toggled(object sender, RoutedEventArgs e)
-        {
-            // set setting
-            localSettings.Values["Test2"] = (toggleSwitchTest2.IsOn).ToString();
-        }
-
-        private void toggleSwitchTest3_Toggled(object sender, RoutedEventArgs e)
-        {
-            // set setting
-            localSettings.Values["Test3"] = (toggleSwitchTest3.IsOn).ToString();
-        }
-
         public async Task updateUI()
         {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 // set Test1 state in UI
                 toggleSwitchTest1.OnContent = (Convert.ToBoolean(localSettings.Values["winFormTest1"])) ? "It is: On" : "It is: Off";
@@ -138,6 +140,16 @@ namespace UINotUpdatingFromDispatcher
 
             // it is as if the code does not run, however, breakpoints are hit and, according to Visual Studio, the properties change, but
             // no visual change occurs. the same happens with Checkboxes. works perfectly with button. what to do??
+        }
+
+        public async Task<bool> SendToWin32(ValueSet message)
+        {
+            if (App.Connection != null)
+            {
+                AppServiceResponse serviceResponse = await App.Connection.SendMessageAsync(message);
+                if (serviceResponse.Status == AppServiceResponseStatus.Success) return true;
+            }
+            return false;
         }
 
         public async void Connection_OnRequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
@@ -182,11 +194,6 @@ namespace UINotUpdatingFromDispatcher
             {
                 // send current settings as response
                 AppServiceResponseStatus responseStatus = await args.Request.SendResponseAsync(UpdateWin32());
-            }
-            else if (args.Request.Message.ContainsKey("exit"))
-            {
-                // exit
-                Application.Current.Exit();
             }
         }
 

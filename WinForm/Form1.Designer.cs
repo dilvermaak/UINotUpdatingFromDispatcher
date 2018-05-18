@@ -45,6 +45,7 @@
             this.checkBoxTest1.TabIndex = 3;
             this.checkBoxTest1.Text = "Test 1";
             this.checkBoxTest1.UseVisualStyleBackColor = true;
+            this.checkBoxTest1.CheckedChanged += new System.EventHandler(this.checkBoxTest1_CheckedChanged);
             // 
             // checkBoxTest2
             // 
@@ -55,6 +56,7 @@
             this.checkBoxTest2.TabIndex = 4;
             this.checkBoxTest2.Text = "Test 2";
             this.checkBoxTest2.UseVisualStyleBackColor = true;
+            this.checkBoxTest2.CheckedChanged += new System.EventHandler(this.checkBoxTest2_CheckedChanged);
             // 
             // checkBoxTest3
             // 
@@ -65,6 +67,7 @@
             this.checkBoxTest3.TabIndex = 5;
             this.checkBoxTest3.Text = "Test 3";
             this.checkBoxTest3.UseVisualStyleBackColor = true;
+            this.checkBoxTest3.CheckedChanged += new System.EventHandler(this.checkBoxTest3_CheckedChanged);
             // 
             // lblTest1
             // 

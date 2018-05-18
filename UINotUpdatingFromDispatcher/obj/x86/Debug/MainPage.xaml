@@ -9,11 +9,11 @@
 
     <Grid x:ConnectionId='1' Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"                       >
         <ToggleSwitch x:ConnectionId='2' x:Name="toggleSwitchTest1" OffContent="It is" OnContent="It is" HorizontalAlignment="Left" Margin="19,19,0,0" 
-                      VerticalAlignment="Top" IsOn="False"/>
+                      VerticalAlignment="Top" IsOn="False"                                    />
         <ToggleSwitch x:ConnectionId='3' x:Name="toggleSwitchTest2" OffContent="It is" OnContent="It is" HorizontalAlignment="Left" Margin="19,51,0,0"
-                      VerticalAlignment="Top" IsOn="False"/>
+                      VerticalAlignment="Top" IsOn="False"                                    />
         <ToggleSwitch x:ConnectionId='4' x:Name="toggleSwitchTest3" OffContent="It is" OnContent="It is" HorizontalAlignment="Left" Margin="19,83,0,0" 
-                      VerticalAlignment="Top" IsOn="False"/>
+                      VerticalAlignment="Top" IsOn="False"                                    />
         
         <Button x:ConnectionId='5' x:Name="btnLaunchWinform" Content="Launch Winform (click here if WinForm didn't launch)" HorizontalAlignment="Left" 
                 VerticalAlignment="Top" Margin="19,125,0,0"                               />

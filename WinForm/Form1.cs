@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.AppService;
-using Windows.ApplicationModel.Core;
 using Windows.Foundation.Collections;
 
 namespace WinForm
 {
     public partial class MainForm : Form
     {
-        private AppServiceConnection connection = null;
+        CommunicationPath commPath;
 
         bool test1 = false;
         bool test2 = false;
@@ -23,145 +18,47 @@ namespace WinForm
 
         System.Timers.Timer tCheckLockedBoxes = new System.Timers.Timer();
 
-        public MainForm()
+        public MainForm(CommunicationPath _commPath)
         {
             InitializeComponent();
 
-            // init timer
-            tCheckLockedBoxes.Elapsed += tCheckLockedBoxes_Elapsed;
-            tCheckLockedBoxes.Interval = 250;
-
-            // send details to UWP
-            int[] lockedKeysStatuses = new int[] { Convert.ToInt32(test1), Convert.ToInt32(test2), Convert.ToInt32(test3) };
-            Start(lockedKeysStatuses);
+            commPath = _commPath;
         }
 
-        private async void Start(int[] lockedKeysStatuses)
+        private void checkBoxTest1_CheckedChanged(object sender, EventArgs e)
         {
-            await SendToUWPVoidAsync(lockedKeysStatuses);
+            // update UWP
+            commPath.updateUWP(false, GetStatuses(), checkBoxTest1.Checked, checkBoxTest2.Checked, checkBoxTest3.Checked);
         }
 
-        private async void tCheckLockedBoxes_Elapsed(object sender, EventArgs e)
+        private void checkBoxTest2_CheckedChanged(object sender, EventArgs e)
         {
-            // init bool
-            bool success = false;
-
-            // update all bools
-            test1 = checkBoxTest1.Checked;
-            test2 = checkBoxTest2.Checked;
-            test3 = checkBoxTest3.Checked;
-
-            // build string from bool values
-            int[] lockedKeysStatus = new int[] { Convert.ToInt32(test1), Convert.ToInt32(test2), Convert.ToInt32(test3) };
-
-            // update UWP sibling
-            success = await SendToUWPVoidAsync(lockedKeysStatus);
-
-            // ask for new settngs
-            if (success) await SendToUWPVoidAsync("request");
+            // update UWP
+            commPath.updateUWP(false, GetStatuses(), checkBoxTest1.Checked, checkBoxTest2.Checked, checkBoxTest3.Checked);
         }
 
-        private async Task<bool> SendToUWPVoidAsync(object content)
+        private void checkBoxTest3_CheckedChanged(object sender, EventArgs e)
         {
-            ValueSet message = new ValueSet();
-            if (content != "request") message.Add("content", content);
-            else message.Add(content as string, "");
-
-            #region SendToUWP
-
-            // if connection isn't inited
-            if (connection == null)
-            {
-                // init
-                connection = new AppServiceConnection();
-                connection.PackageFamilyName = Package.Current.Id.FamilyName;
-                connection.AppServiceName = "UWPSibling";
-                connection.ServiceClosed += Connection_ServiceClosed;
-                //connection.RequestReceived += Connection_OnRequestReceived;
-
-                // attempt connection 
-                AppServiceConnectionStatus connectionStatus = await connection.OpenAsync();
-            }
-
-            AppServiceResponse serviceResponse = null;
-            try
-            {
-                // send message
-                serviceResponse = await connection.SendMessageAsync(message);
-            }
-            catch (Exception)
-            {
-                try
-                {
-                    // sleep for 1 sec
-                    Thread.Sleep(1000);
-
-                    // retry
-                    serviceResponse = await connection.SendMessageAsync(message);
-                }
-                catch (Exception)
-                {
-                    // exit 
-                    test1 = false;
-                    test2 = false;
-                    test3 = false;
-
-                    Application.Exit();
-                }
-            }
-
-            // get response
-            if (serviceResponse.Message.ContainsKey("content"))
-            {
-                object newMessage = null;
-                serviceResponse.Message.TryGetValue("content", out newMessage);
-                // if message is an int[]
-                if (newMessage is int[])
-                {
-                    // init field vars
-                    int indexInArray = 0;
-                    foreach (int trueorfalse in (int[])newMessage)
-                    {
-                        // set bool state based on index
-                        switch (indexInArray)
-                        {
-                            case 0:
-                                this.Invoke((MethodInvoker)delegate
-                                {
-                                    lblTest1.Text = (Convert.ToBoolean(trueorfalse)) ? "UWP Test 1: Is On" : "UWP Test 1: Is Off";
-                                });
-                                break;
-                            case 1:
-                                this.Invoke((MethodInvoker)delegate
-                                {
-                                    lblTest2.Text = (Convert.ToBoolean(trueorfalse)) ? "UWP Test 2: Is On" : "UWP Test 2: Is Off";
-                                });
-                                break;
-                            case 2:
-                                this.Invoke((MethodInvoker)delegate
-                                {
-                                    lblTest3.Text = (Convert.ToBoolean(trueorfalse)) ? "UWP Test 3: Is On" : "UWP Test 3: Is Off";
-                                });
-                                break;
-                            default:
-                                break;
-                        }
-                        indexInArray++;
-                    }
-                }
-            }
-            #endregion
-
-            if (!tCheckLockedBoxes.Enabled) tCheckLockedBoxes.Start();
-            return true;
+            // update UWP
+            commPath.updateUWP(false, GetStatuses(), checkBoxTest1.Checked, checkBoxTest2.Checked, checkBoxTest3.Checked);
         }
 
-        void Connection_ServiceClosed(AppServiceConnection sender, AppServiceClosedEventArgs args)
+        public void SetStatuses(bool Test1On, bool Test2On, bool Test3On)
         {
-            connection.ServiceClosed -= Connection_ServiceClosed;
-            connection = null;
+            this.Invoke((MethodInvoker)delegate
+            {
+                lblTest1.Text = (Test1On) ? "UWP Test 1: Is On" : "UWP Test 1: Is Off";
+                lblTest2.Text = (Test2On) ? "UWP Test 2: Is On" : "UWP Test 2: Is Off";
+                lblTest3.Text = (Test3On) ? "UWP Test 3: Is On" : "UWP Test 3: Is Off";
+            });
+        }
 
-            // close
+        public int[] GetStatuses() => new int[] { Convert.ToInt32(checkBoxTest1.Checked), Convert.ToInt32(checkBoxTest2.Checked),
+            Convert.ToInt32(checkBoxTest3.Checked) };
+
+        public void Exit()
+        {
+            // quit
             Application.Exit();
         }
     }
